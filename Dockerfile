@@ -14,11 +14,11 @@ RUN apk add --no-cache nodejs npm && \
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # --- Directories ---
-RUN mkdir -p /home/appuser/work /home/appuser/.pi/agent && \
+RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent && \
     chown -R appuser:appgroup /home/appuser
 
 USER appuser
-WORKDIR /home/appuser/work
+WORKDIR /home/appuser/mount
 
 ENV HOME=/home/appuser
 ENV NODE_ENV=development

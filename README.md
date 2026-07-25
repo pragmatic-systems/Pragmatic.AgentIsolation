@@ -38,7 +38,7 @@ The container has **outbound internet access** by default, so Pi can install too
 ```
 Host Machine
 ├── ./src/          ← Your codebase (mounted read-only)
-├── ./work/         ← Pi's read-write workspace
+├── ./mount/        ← Pi's read-write workspace
 ├── docker-compose.yml
 ├── Dockerfile
 └── Container: pi-coding-harness
@@ -46,7 +46,7 @@ Host Machine
     ├── Connects to LM Studio via host.docker.internal:1234
     ├── Outbound internet access (package restore, tool install)
     ├── Non-root user, no capabilities, no privilege escalation
-    └── Only reads/writes to ./work
+    └── Only reads/writes to ./mount
 ```
 
 ## Security
@@ -58,7 +58,7 @@ Host Machine
 | Capabilities dropped | ✅ | `cap_drop: ALL` |
 | No new privileges | ✅ | `no-new-privileges:true` |
 | No port exposure | ✅ | No `ports:` block |
-| Limited volume mounts | ✅ | Only `./work` (rw), `./src` (ro) |
+| Limited volume mounts | ✅ | Only `./mount` (rw), `./src` (ro) |
 | Resource limits | ✅ | 4GB RAM, 2 CPUs |
 
 ## Configuration

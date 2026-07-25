@@ -14,10 +14,10 @@ services:
     stdin_open: true
 
     # --- Volumes ---
-    # ./work  →  Pi's read-write workspace
+    # ./mount  →  Pi's read-write workspace
     # ./src   →  your codebase (read-only, optional)
     volumes:
-      - ./work:/home/appuser/work:rw
+      - ./mount:/home/appuser/mount:rw
       - ./src:/home/appuser/src:ro
       - pi_cache:/home/appuser/.pi:rw
       - ./models.json:/home/appuser/.pi/agent/models.json:ro
