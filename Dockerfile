@@ -22,7 +22,7 @@ COPY --from=builder /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # --- Directories ---
-RUN mkdir -p /home/appuser/work /home/appuser/.pi && \
+RUN mkdir -p /home/appuser/work /home/appuser/.pi/agent && \
     chown -R appuser:appgroup /home/appuser
 
 USER appuser
@@ -31,5 +31,5 @@ WORKDIR /home/appuser/work
 ENV HOME=/home/appuser
 ENV NODE_ENV=development
 
-# Default to a long-running shell so you can docker exec in and run `pi` interactively
-CMD ["sh", "-c", "while true; do sleep 86400; done"]
+# Launch Pi TUI directly so docker attach works
+CMD ["pi"]

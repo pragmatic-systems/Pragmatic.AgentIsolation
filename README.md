@@ -54,3 +54,18 @@ Host Machine
 - **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable in `docker-compose.yml`
 - **Custom models/providers** are configured in `models.json`
 - **Pi cache** is persisted in a Docker volume (`pi_cache`) so it survives restarts
+
+### Updating `models.json`
+
+`models.json` is bind-mounted directly from the host, so changes take effect on the **next container start** — no rebuild needed:
+
+```bash
+docker compose up -d
+docker attach pi-coding-harness
+```
+
+If you need to rebuild the image (e.g., after changing the Dockerfile):
+
+```bash
+docker compose build && docker compose up -d && docker attach pi-coding-harness
+```
