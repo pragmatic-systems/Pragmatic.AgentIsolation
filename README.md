@@ -20,7 +20,7 @@ docker attach pi-coding-harness
 
 - **Docker Desktop** running
 - **LM Studio** running with the Local Server API enabled on port `1234`
-- Your project source code in `./src/` (optional, mounted read-only)
+- Your project source code in `./mount/` (read-write workspace)
 
 ## Runtime Environment
 
@@ -37,7 +37,6 @@ The container has **outbound internet access** by default, so Pi can install too
 
 ```
 Host Machine
-├── ./src/          ← Your codebase (mounted read-only)
 ├── ./mount/        ← Pi's read-write workspace
 ├── docker-compose.yml
 ├── Dockerfile
@@ -58,7 +57,7 @@ Host Machine
 | Capabilities dropped | ✅ | `cap_drop: ALL` |
 | No new privileges | ✅ | `no-new-privileges:true` |
 | No port exposure | ✅ | No `ports:` block |
-| Limited volume mounts | ✅ | Only `./mount` (rw), `./src` (ro) |
+| Limited volume mounts | ✅ | Only `./mount` (rw) |
 | Resource limits | ✅ | 4GB RAM, 2 CPUs |
 
 ## Configuration

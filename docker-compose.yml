@@ -15,10 +15,8 @@ services:
 
     # --- Volumes ---
     # ./mount  →  Pi's read-write workspace
-    # ./src   →  your codebase (read-only, optional)
     volumes:
       - ./mount:/home/appuser/mount:rw
-      - ./src:/home/appuser/src:ro
       - pi_cache:/home/appuser/.pi:rw
       - ./models.json:/home/appuser/.pi/agent/models.json:ro
 
