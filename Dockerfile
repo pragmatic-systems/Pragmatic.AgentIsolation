@@ -1,18 +1,25 @@
 # -----------------------------------------------------------
 # Pi Coding Agent — isolated harness
 # -----------------------------------------------------------
-# Build stage: install Pi globally, then bake into a minimal
-# runtime image so no npm work happens at container start.
+# Build stage: install Pi globally on top of .NET SDK 10.0,
+# then bake into a minimal runtime image so no npm work
+# happens at container start.
 # -----------------------------------------------------------
 
-FROM node:22-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS builder
+
+# Install Node.js 22 for Pi
+RUN apk add --no-cache nodejs npm
 
 RUN npm install -g @earendil-works/pi-coding-agent
 
 # -----------------------------------------------------------
 # Runtime stage
 # -----------------------------------------------------------
-FROM node:22-alpine
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
+
+# Install Node.js 22 for Pi runtime
+RUN apk add --no-cache nodejs npm
 
 # --- Non-root user ---
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

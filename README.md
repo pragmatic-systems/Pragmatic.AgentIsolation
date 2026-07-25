@@ -22,6 +22,17 @@ docker attach pi-coding-harness
 - **LM Studio** running with the Local Server API enabled on port `1234`
 - Your project source code in `./src/` (optional, mounted read-only)
 
+## Runtime Environment
+
+The container ships with:
+
+| Tool | Version |
+|---|---|
+| .NET SDK | 10.0.100 |
+| Node.js | 22 (Alpine) |
+
+The container has **outbound internet access** by default, so Pi can install tools (e.g. `dotnet tool install`, `npm install`) and restore packages (`dotnet restore`, `npm ci`) at runtime.
+
 ## Architecture
 
 ```
@@ -31,8 +42,9 @@ Host Machine
 ├── docker-compose.yml
 ├── Dockerfile
 └── Container: pi-coding-harness
-    ├── Runs Pi (Node.js 22)
+    ├── Runs Pi (Node.js 22) + .NET SDK 10.0
     ├── Connects to LM Studio via host.docker.internal:1234
+    ├── Outbound internet access (package restore, tool install)
     ├── Non-root user, no capabilities, no privilege escalation
     └── Only reads/writes to ./work
 ```
