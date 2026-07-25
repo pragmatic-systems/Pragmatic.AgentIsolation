@@ -25,21 +25,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 RUN mkdir -p /home/appuser/work /home/appuser/.pi && \
     chown -R appuser:appgroup /home/appuser
 
-# Copy entrypoint and make executable
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 USER appuser
 WORKDIR /home/appuser/work
 
 ENV HOME=/home/appuser
 ENV NODE_ENV=development
 
-# --- Healthcheck ---
-# Pi writes a lockfile / PID when running; we probe the
-# process table instead since there is no exposed HTTP port.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD pgrep -f "node.*pi" || exit 1
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["pi"]
+# Default to a long-running shell so you can docker exec in and run `pi` interactively
+CMD ["sh", "-c", "while true; do sleep 86400; done"]

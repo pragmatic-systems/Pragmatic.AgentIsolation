@@ -2,15 +2,16 @@ services:
   pi-agent:
     build: .
     container_name: pi-coding-harness
-    restart: unless-stopped
 
     # --- Security ---
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN   # entrypoint needs this to fix bind-mount ownership
     security_opt:
       - no-new-privileges:true
+
+    # --- TTY for interactive Pi TUI ---
+    tty: true
+    stdin_open: true
 
     # --- Volumes ---
     # ./work  →  Pi's read-write workspace
