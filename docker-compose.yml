@@ -1,0 +1,39 @@
+services:
+  pi-agent:
+    build: .
+    container_name: pi-coding-harness
+    restart: unless-stopped
+
+    # --- Security ---
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN   # entrypoint needs this to fix bind-mount ownership
+    security_opt:
+      - no-new-privileges:true
+
+    # --- Volumes ---
+    # ./work  →  Pi's read-write workspace
+    # ./src   →  your codebase (read-only, optional)
+    volumes:
+      - ./work:/home/appuser/work:rw
+      - ./src:/home/appuser/src:ro
+      - pi_cache:/home/appuser/.pi:rw
+
+    # --- Environment ---
+    environment:
+      - HOME=/home/appuser
+      - NODE_ENV=development
+      # Point Pi at LM Studio on the host (Docker Desktop for Windows)
+      - LMSTUDIO_API_URL=http://host.docker.internal:1234/v1
+
+    # --- Resources ---
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+
+volumes:
+  pi_cache:
+    driver: local
