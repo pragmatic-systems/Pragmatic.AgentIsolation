@@ -1,7 +1,8 @@
 services:
   pi-agent:
     build: .
-    container_name: pi-coding-harness
+    image: pi-agent-isolation-host
+    container_name: pi-agent-isolation-host
 
     # --- Security ---
     cap_drop:
@@ -17,8 +18,8 @@ services:
     # ./mount  →  Pi's read-write workspace
     volumes:
       - ./mount:/home/appuser/mount:rw
-      - pi_cache:/home/appuser/.pi:rw
       - ./models.json:/home/appuser/.pi/agent/models.json:ro
+      - pi_cache:/home/appuser/.pi:rw
 
     # --- Environment ---
     environment:

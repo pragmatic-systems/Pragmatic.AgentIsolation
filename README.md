@@ -2,25 +2,35 @@
 
 A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in isolation, with controlled filesystem access and LM Studio integration.
 
+## Setup
+
+Add the `scripts/` folder to your `%PATH%` (Windows) or `$PATH` (Linux/macOS):
+
+### Windows (PowerShell)
+```powershell
+[Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\path\to\Pragmatic.AgentIsolation\scripts", "User")
+```
+
+### Linux / macOS
+```bash
+export PATH="$PATH:/path/to/Pragmatic.AgentIsolation/scripts"
+```
+
 ## Quick Start
 
-### 1. Start the container in the background
+Run `pi-agent` from any directory — it mounts your current working directory as Pi's workspace:
 
 ```bash
-docker compose up -d
+cd /path/to/your/project
+pi-agent
 ```
 
-### 2. Attach to Pi's interactive console
-
-```bash
-docker attach pi-coding-harness
-```
+When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 
 ## Prerequisites
 
 - **Docker Desktop** running
 - **LM Studio** running with the Local Server API enabled on port `1234`
-- Your project source code in `./mount/` (read-write workspace)
 
 ## Runtime Environment
 
@@ -37,15 +47,14 @@ The container has **outbound internet access** by default, so Pi can install too
 
 ```
 Host Machine
-├── ./mount/        ← Pi's read-write workspace
-├── docker-compose.yml
-├── Dockerfile
-└── Container: pi-coding-harness
+├── Your project directory
+│   └── (mounted as /home/appuser/mount inside container)
+└── Container: pi-agent-isolation-host
     ├── Runs Pi (Node.js 22) + .NET SDK 10.0
     ├── Connects to LM Studio via host.docker.internal:1234
     ├── Outbound internet access (package restore, tool install)
     ├── Non-root user, no capabilities, no privilege escalation
-    └── Only reads/writes to ./mount
+    └── Auto-cleaned on exit (--rm)
 ```
 
 ## Security
@@ -57,26 +66,26 @@ Host Machine
 | Capabilities dropped | ✅ | `cap_drop: ALL` |
 | No new privileges | ✅ | `no-new-privileges:true` |
 | No port exposure | ✅ | No `ports:` block |
-| Limited volume mounts | ✅ | Only `./mount` (rw) |
+| Limited volume mounts | ✅ | Only current directory (rw) |
 | Resource limits | ✅ | 4GB RAM, 2 CPUs |
 
 ## Configuration
 
-- **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable in `docker-compose.yml`
+- **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable
 - **Custom models/providers** are configured in `models.json`
 - **Pi cache** is persisted in a Docker volume (`pi_cache`) so it survives restarts
 
 ### Updating `models.json`
 
-`models.json` is bind-mounted directly from the host, so changes take effect on the **next container start** — no rebuild needed:
+`models.json` is bind-mounted directly from the repo root, so changes take effect on the **next run**:
 
 ```bash
-docker compose up -d
-docker attach pi-coding-harness
+pi-agent
 ```
 
 If you need to rebuild the image (e.g., after changing the Dockerfile):
 
 ```bash
-docker compose build && docker compose up -d && docker attach pi-coding-harness
+docker compose build
+pi-agent
 ```
