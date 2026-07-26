@@ -23,7 +23,8 @@ RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh &&
 RUN npm install -g @earendil-works/pi-coding-agent
 
 # --- Non-root user ---
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
+    addgroup appuser docker
 
 # --- Directories ---
 RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent && \
