@@ -16,8 +16,10 @@ export MSYS_NO_PATHCONV=1
 docker build -q -t pi-agent-isolation-host "$REPO_ROOT" 2>/dev/null
 
 # Run Pi
+LAUNCH_DIR="$(basename "$(pwd)")"
 docker run --rm \
-  -v "$(pwd):/home/appuser/mount:rw" \
+  -w "/home/appuser/mount/${LAUNCH_DIR}" \
+  -v "$(pwd):/home/appuser/mount/${LAUNCH_DIR}:rw" \
   -v pi_cache:/home/appuser/.pi/cache:rw \
   -v "/var/run/docker.sock:/var/run/docker.sock:rw" \
   -e HOME=/home/appuser \

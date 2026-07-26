@@ -9,8 +9,10 @@ $RepoRoot = (Resolve-Path (Split-Path -Parent $PSScriptRoot)).Path
 docker build -t pi-agent-isolation-host "$RepoRoot"
 
 # Run Pi
+$LaunchDir = Split-Path $PWD -Leaf
 docker run --rm `
-  -v "${PWD}:/home/appuser/mount:rw" `
+  -w "/home/appuser/mount/${LaunchDir}" `
+  -v "${PWD}:/home/appuser/mount/${LaunchDir}:rw" `
   -v pi_cache:/home/appuser/.pi/cache:rw `
   -v "//var/run/docker.sock:/var/run/docker.sock:rw" `
   -e HOME=/home/appuser `
