@@ -18,14 +18,26 @@ export PATH="$PATH:/path/to/Pragmatic.AgentIsolation/scripts"
 
 ## Quick Start
 
-Run `pi-agent` from any directory — it mounts your current working directory as Pi's workspace:
+Run `pi-agent-isolation-host` from any directory — it mounts your current working directory as Pi's workspace:
 
 ```bash
 cd /path/to/your/project
-pi-agent
+pi-agent-isolation-host
 ```
 
 When you exit Pi (Ctrl+C), the container is automatically cleaned up.
+
+### Modes
+
+| Mode | Command | Docker CLI | Socket Mount | Security Hardening |
+|---|---|---|---|---|
+| **Locked-down** (default) | `pi-agent-isolation-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
+| **Docker-in-Docker** | `pi-agent-isolation-host --docker` | ✅ | ✅ | Relaxed (for DinD compatibility) |
+
+```bash
+# With Docker support (opt-in)
+pi-agent-isolation-host --docker
+```
 
 ## Prerequisites
 
@@ -38,9 +50,9 @@ The container ships with:
 
 | Tool | Version |
 |---|---|
-| .NET SDK | 10.0.100 |
+| .NET SDK | 10.0.100, 9.0, 8.0 |
 | Node.js | 22 (Alpine) |
-| Docker CLI | Alpine edge |
+| Docker CLI | Alpine edge (DinD mode only) |
 
 The container has **outbound internet access** by default, so Pi can install tools (e.g. `dotnet tool install`, `npm install`) and restore packages (`dotnet restore`, `npm ci`) at runtime.
 
@@ -60,13 +72,15 @@ Host Machine
 
 ## Security
 
-| Control | Status | Details |
-|---|---|
-| Non-root user | ✅ | Runs as `appuser` |
-| No privileged mode | ✅ | Default |
-| No port exposure | ✅ | No `ports:` block |
-| Resource limits | ✅ | 4GB RAM, 2 CPUs |
-| Docker socket mount | ⚠️ | `/var/run/docker.sock` mounted for DinD support |
+| Control | Locked-down | DinD (`--docker`) | Details |
+|---|---|---|---|
+| Non-root user | ✅ | ✅ | Runs as `appuser` |
+| No privileged mode | ✅ | ✅ | Default |
+| No port exposure | ✅ | ✅ | No `ports:` block |
+| Resource limits | ✅ | ✅ | 4GB/2 CPUs (bash), 8GB/4 CPUs (pwsh) |
+| `--cap-drop=ALL` | ✅ | ❌ | All Linux capabilities dropped |
+| `no-new-privileges` | ✅ | ❌ | Prevents privilege escalation |
+| Docker socket mount | ❌ | ⚠️ | `/var/run/docker.sock` mounted |
 
 ## Configuration
 
@@ -79,18 +93,24 @@ Host Machine
 `models.json` is bind-mounted directly from the repo root, so changes take effect on the **next run**:
 
 ```bash
-pi-agent
+pi-agent-isolation-host
 ```
 
 If you need to rebuild the image (e.g., after changing the Dockerfile):
 
 ```bash
 docker build -t pi-agent-isolation-host .
-pi-agent
+pi-agent-isolation-host
 ```
 
 ## Docker-in-Docker
 
-The container includes the Docker CLI and mounts the host Docker socket, allowing Pi to run Docker commands (e.g., `docker build`, `docker run`, `docker compose`) against the host Docker daemon.
+By default, the container runs in **locked-down mode** — no Docker CLI is installed, no socket is mounted, and all Linux capabilities are dropped. To enable Docker-in-Docker support, pass `--docker`:
 
-> **Security note:** Mounting the Docker socket grants the container significant control over the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions have been relaxed to support this.
+```bash
+pi-agent-isolation-host --docker
+```
+
+This builds from the full `Dockerfile` (which includes the Docker CLI) and mounts the host Docker socket, allowing Pi to run Docker commands (e.g., `docker build`, `docker run`, `docker compose`) against the host Docker daemon.
+
+> **Security note:** Mounting the Docker socket grants the container significant control over the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions are relaxed in this mode to support it. Only use `--docker` when Docker support is actually needed.
