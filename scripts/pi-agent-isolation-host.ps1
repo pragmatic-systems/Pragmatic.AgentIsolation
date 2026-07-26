@@ -17,5 +17,5 @@ docker run --rm `
   -e HOME=/home/appuser `
   -e NODE_ENV=development `
   -e LMSTUDIO_API_URL=http://host.docker.internal:1234/v1 `
-  --memory=4g --cpus=2.0 `
+  --memory=8g --cpus=4.0 `
   -it pi-agent-isolation-host:latest
