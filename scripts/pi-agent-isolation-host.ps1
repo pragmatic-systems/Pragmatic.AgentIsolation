@@ -3,7 +3,7 @@
 
 # Script runs from /scripts folder inside the Pragmatic.AgentIsolation repo. 
 # Dockerfile/compose in parent directory.
-$RepoRoot = Split-Path -Parent $PSScriptRoot
+$RepoRoot = (Resolve-Path (Split-Path -Parent $PSScriptRoot)).Path
 
 # Build image (no-op if already built)
 docker compose -f "$RepoRoot\docker-compose.yml" build
@@ -12,8 +12,7 @@ docker compose -f "$RepoRoot\docker-compose.yml" build
 docker run --rm `
   --name pi-agent-isolation-host `
   -v "${PWD}:/home/appuser/mount:rw" `
-  -v pi_cache:/home/appuser/.pi:rw `
-  -v "${RepoRoot}\models.json:/home/appuser/.pi/agent/models.json:ro" `
+  -v pi_cache:/home/appuser/.pi/cache:rw `
   -e HOME=/home/appuser `
   -e NODE_ENV=development `
   -e LMSTUDIO_API_URL=http://host.docker.internal:1234/v1 `

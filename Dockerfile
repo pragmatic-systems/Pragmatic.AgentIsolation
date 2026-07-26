@@ -17,6 +17,9 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent && \
     chown -R appuser:appgroup /home/appuser
 
+# --- Pi model config (baked in to avoid WSL path-mount issues) ---
+COPY models.json /home/appuser/.pi/agent/models.json
+
 USER appuser
 WORKDIR /home/appuser/mount
 

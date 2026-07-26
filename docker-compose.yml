@@ -16,10 +16,10 @@ services:
 
     # --- Volumes ---
     # ./mount  →  Pi's read-write workspace
+    # models.json is baked into the image at build time
     volumes:
       - ./mount:/home/appuser/mount:rw
-      - ./models.json:/home/appuser/.pi/agent/models.json:ro
-      - pi_cache:/home/appuser/.pi:rw
+      - pi_cache:/home/appuser/.pi/cache:rw
 
     # --- Environment ---
     environment:
