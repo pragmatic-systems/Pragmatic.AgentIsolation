@@ -6,8 +6,8 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
-# Install Node.js 22 and Pi
-RUN apk add --no-cache nodejs npm && \
+# Install Node.js 22, Docker CLI, and Pi
+RUN apk add --no-cache nodejs npm docker && \
     npm install -g @earendil-works/pi-coding-agent
 
 # --- Non-root user ---

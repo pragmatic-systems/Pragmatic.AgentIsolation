@@ -40,6 +40,7 @@ The container ships with:
 |---|---|
 | .NET SDK | 10.0.100 |
 | Node.js | 22 (Alpine) |
+| Docker CLI | Alpine edge |
 
 The container has **outbound internet access** by default, so Pi can install tools (e.g. `dotnet tool install`, `npm install`) and restore packages (`dotnet restore`, `npm ci`) at runtime.
 
@@ -60,14 +61,12 @@ Host Machine
 ## Security
 
 | Control | Status | Details |
-|---|---|---|
+|---|---|
 | Non-root user | ✅ | Runs as `appuser` |
 | No privileged mode | ✅ | Default |
-| Capabilities dropped | ✅ | `cap_drop: ALL` |
-| No new privileges | ✅ | `no-new-privileges:true` |
 | No port exposure | ✅ | No `ports:` block |
-| Limited volume mounts | ✅ | Only current directory (rw) |
 | Resource limits | ✅ | 4GB RAM, 2 CPUs |
+| Docker socket mount | ⚠️ | `/var/run/docker.sock` mounted for DinD support |
 
 ## Configuration
 
@@ -86,6 +85,12 @@ pi-agent
 If you need to rebuild the image (e.g., after changing the Dockerfile):
 
 ```bash
-docker compose build
+docker build -t pi-agent-isolation-host .
 pi-agent
 ```
+
+## Docker-in-Docker
+
+The container includes the Docker CLI and mounts the host Docker socket, allowing Pi to run Docker commands (e.g., `docker build`, `docker run`, `docker compose`) against the host Docker daemon.
+
+> **Security note:** Mounting the Docker socket grants the container significant control over the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions have been relaxed to support this.
