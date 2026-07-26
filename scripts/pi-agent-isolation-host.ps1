@@ -10,7 +10,6 @@ docker build -t pi-agent-isolation-host "$RepoRoot"
 
 # Run Pi
 docker run --rm `
-  --name pi-agent-isolation-host `
   -v "${PWD}:/home/appuser/mount:rw" `
   -v pi_cache:/home/appuser/.pi/cache:rw `
   -v "//var/run/docker.sock:/var/run/docker.sock:rw" `
