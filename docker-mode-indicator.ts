@@ -9,12 +9,21 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
+
+    // Set Docker Status
+    var message = "🐳 Secure Sandbox";
+
     const inDocker = process.env.PI_DOCKER_MODE === "true";
     if (inDocker) {
-      ctx.ui.setStatus(
-        "docker-mode",
-        ctx.ui.theme.fg("warning", "🐳 docker"),
-      );
+      message += " (❗) docker in docker (❗)";
     }
+    else {
+      message += " (✅) locked down (✅)";
+    }
+
+    ctx.ui.setStatus(
+      "sandbox-mode",
+      ctx.ui.theme.fg("warning", message),
+    );
   });
 }

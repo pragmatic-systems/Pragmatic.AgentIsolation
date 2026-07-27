@@ -34,6 +34,10 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 | **Locked-down** (default) | `pi-agent-sandbox-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
 | **Docker** (opt-in) | `pi-agent-sandbox-host --docker` | ✅ | ✅ | None (see Security) |
 
+> **Tip:** The current mode is shown in the Pi footer status bar:
+> - `🐳 Secure Sandbox (✅) locked down (✅)` — locked-down mode (default)
+> - `🐳 Secure Sandbox (❗) docker in docker (❗)` — Docker mode (host socket mounted)
+
 ```bash
 # With Docker support (opt-in, host socket mount)
 pi-agent-sandbox-host --docker
