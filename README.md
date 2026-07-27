@@ -112,7 +112,8 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 
 - **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable
 - **Custom models/providers** are configured in `models.json`
-- **Pi cache** is persisted in a Docker volume (`pi_cache`) so it survives restarts
+- **Pi cache** is persisted in a Docker volume (`pi_cache`)
+- **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts
 
 ### Updating `models.json`
 
