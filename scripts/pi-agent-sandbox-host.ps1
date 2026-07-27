@@ -55,6 +55,8 @@ if (-not $EnableDocker) {
     # Mount Docker socket for DinD support
     $DockerArgs += "-v"
     $DockerArgs += "//var/run/docker.sock:/var/run/docker.sock:rw"
+    $DockerArgs += "-e"
+    $DockerArgs += "PI_DOCKER_MODE=true"
 }
 
 $DockerArgs += $ImageName

@@ -27,11 +27,13 @@ RUN npm install -g @earendil-works/pi-coding-agent
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # --- Directories ---
-RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent && \
+RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions && \
     chown -R appuser:appgroup /home/appuser
 
-# --- Pi model config (baked in to avoid WSL path-mount issues) ---
+# --- Pi config (baked in to avoid WSL path-mount issues) ---
 COPY models.json /home/appuser/.pi/agent/models.json
+COPY settings.json /home/appuser/.pi/agent/settings.json
+COPY docker-mode-indicator.ts /home/appuser/.pi/agent/extensions/docker-mode-indicator.ts
 
 USER appuser
 WORKDIR /home/appuser/mount

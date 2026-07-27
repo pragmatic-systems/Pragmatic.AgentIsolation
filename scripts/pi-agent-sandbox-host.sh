@@ -66,6 +66,7 @@ else
   # Mount Docker socket for Docker support
   DOCKER_ARGS+=(
     -v "/var/run/docker.sock:/var/run/docker.sock:rw"
+    -e "PI_DOCKER_MODE=true"
   )
 fi
 
