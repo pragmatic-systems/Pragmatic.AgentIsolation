@@ -4,7 +4,7 @@
 #
 # Usage:
 #   pi-agent-isolation-host             # locked-down (no Docker)
-#   pi-agent-isolation-host --docker    # with Docker-in-Docker support
+#   pi-agent-isolation-host --docker     # with Docker-in-Docker support (host socket)
 
 set -euo pipefail
 
@@ -24,7 +24,7 @@ done
 if [ "$ENABLE_DOCKER" = true ]; then
   DOCKERFILE="Dockerfile"
   IMAGE_NAME="pi-agent-isolation-host-dind"
-  echo "[pi-agent] Docker-in-Docker enabled"
+  echo "[pi-agent] Docker-in-Docker enabled (host socket)"
 else
   DOCKERFILE="Dockerfile.locked"
   IMAGE_NAME="pi-agent-isolation-host"
@@ -50,8 +50,8 @@ DOCKER_ARGS=(
   -e HOME=/home/appuser
   -e NODE_ENV=development
   -e LMSTUDIO_API_URL=http://host.docker.internal:1234/v1
-  --memory=4g
-  --cpus=2.0
+  --memory=8g
+  --cpus=4.0
   -it
 )
 
@@ -62,7 +62,7 @@ if [ "$ENABLE_DOCKER" = false ]; then
     --security-opt=no-new-privileges:true
   )
 else
-  # Mount Docker socket for DinD support
+  # Mount Docker socket for Docker support
   DOCKER_ARGS+=(
     -v "/var/run/docker.sock:/var/run/docker.sock:rw"
   )

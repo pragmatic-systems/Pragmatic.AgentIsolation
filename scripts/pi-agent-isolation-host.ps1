@@ -3,7 +3,7 @@
 #
 # Usage:
 #   pi-agent-isolation-host             # locked-down (no Docker)
-#   pi-agent-isolation-host --docker    # with Docker-in-Docker support
+#   pi-agent-isolation-host --docker    # with Docker-in-Docker support (host socket)
 
 # Script runs from /scripts folder inside the Pragmatic.AgentIsolation repo.
 # Dockerfile/compose in parent directory.
@@ -19,7 +19,7 @@ if ($args -contains "--docker") {
 if ($EnableDocker) {
     $Dockerfile = "Dockerfile"
     $ImageName = "pi-agent-isolation-host-dind"
-    Write-Host "[pi-agent] Docker-in-Docker enabled"
+    Write-Host "[pi-agent] Docker-in-Docker enabled (host socket)"
 } else {
     $Dockerfile = "Dockerfile.locked"
     $ImageName = "pi-agent-isolation-host"

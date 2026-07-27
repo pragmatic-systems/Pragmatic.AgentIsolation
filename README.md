@@ -29,13 +29,13 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 
 ### Modes
 
-| Mode | Command | Docker CLI | Socket Mount | Security Hardening |
+| Mode | Command | Docker CLI | Host Socket | Security Hardening |
 |---|---|---|---|---|
 | **Locked-down** (default) | `pi-agent-isolation-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
-| **Docker-in-Docker** | `pi-agent-isolation-host --docker` | ✅ | ✅ | Relaxed (for DinD compatibility) |
+| **Docker** (opt-in) | `pi-agent-isolation-host --docker` | ✅ | ✅ | None (see Security) |
 
 ```bash
-# With Docker support (opt-in)
+# With Docker support (opt-in, host socket mount)
 pi-agent-isolation-host --docker
 ```
 
@@ -52,12 +52,13 @@ The container ships with:
 |---|---|
 | .NET SDK | 10.0.100, 9.0, 8.0 |
 | Node.js | 22 (Alpine) |
-| Docker CLI | Alpine edge (DinD mode only) |
+| Docker CLI | Alpine edge (Docker mode only) |
 
 The container has **outbound internet access** by default, so Pi can install tools (e.g. `dotnet tool install`, `npm install`) and restore packages (`dotnet restore`, `npm ci`) at runtime.
 
 ## Architecture
 
+### Locked-down mode
 ```
 Host Machine
 ├── Your project directory
@@ -70,17 +71,42 @@ Host Machine
     └── Auto-cleaned on exit (--rm)
 ```
 
+### Docker mode
+```
+Host Machine
+├── Your project directory
+│   └── (mounted as /home/appuser/mount inside container)
+└── Container: pi-agent-isolation-host-dind
+    ├── Runs Pi + Docker CLI
+    ├── Connects to LM Studio via host.docker.internal:1234
+    ├── Host Docker socket mounted (full Docker access)
+    └── Auto-cleaned on exit (--rm)
+```
+
 ## Security
 
-| Control | Locked-down | DinD (`--docker`) | Details |
+| Control | Locked-down | Docker (`--docker`) | Details |
 |---|---|---|---|
 | Non-root user | ✅ | ✅ | Runs as `appuser` |
 | No privileged mode | ✅ | ✅ | Default |
 | No port exposure | ✅ | ✅ | No `ports:` block |
 | Resource limits | ✅ | ✅ | 4GB/2 CPUs (bash), 8GB/4 CPUs (pwsh) |
-| `--cap-drop=ALL` | ✅ | ❌ | All Linux capabilities dropped |
-| `no-new-privileges` | ✅ | ❌ | Prevents privilege escalation |
-| Docker socket mount | ❌ | ⚠️ | `/var/run/docker.sock` mounted |
+| `--cap-drop=ALL` | ✅ | ❌ | Requires full capabilities for Docker |
+| `no-new-privileges` | ✅ | ❌ | Requires privilege escalation for Docker |
+| Host Docker socket | ❌ | ✅ | Full access to host Docker daemon |
+
+### Docker mode: trust trade-off
+
+The `--docker` mode mounts the host Docker socket. **This gives the agent full control of the host Docker daemon.** A malicious or compromised agent can:
+
+- Run `--privileged` containers
+- Mount host filesystems (`-v /:/host`)
+- Escape the container via `nsenter` or `--pid=host`
+- Access any host resource the Docker daemon can reach
+
+**There is no way to give an LLM Docker access without this risk.** Docker-in-Docker sidecars offer the same escape path — the agent controls any daemon it can talk to. The only difference is cosmetic isolation.
+
+Only use `--docker` when you need Docker support and accept that the agent has full Docker access.
 
 ## Configuration
 
@@ -103,14 +129,14 @@ docker build -t pi-agent-isolation-host .
 pi-agent-isolation-host
 ```
 
-## Docker-in-Docker
+## Docker Support
 
-By default, the container runs in **locked-down mode** — no Docker CLI is installed, no socket is mounted, and all Linux capabilities are dropped. To enable Docker-in-Docker support, pass `--docker`:
+By default, the container runs in **locked-down mode** — no Docker CLI is installed, no socket is mounted, and all Linux capabilities are dropped. To enable Docker support, pass `--docker`:
 
 ```bash
 pi-agent-isolation-host --docker
 ```
 
-This builds from the full `Dockerfile` (which includes the Docker CLI) and mounts the host Docker socket, allowing Pi to run Docker commands (e.g., `docker build`, `docker run`, `docker compose`) against the host Docker daemon.
+This mounts the host Docker socket, allowing Pi to run Docker commands (`docker build`, `docker run`, `docker compose`) against the host Docker daemon.
 
-> **Security note:** Mounting the Docker socket grants the container significant control over the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions are relaxed in this mode to support it. Only use `--docker` when Docker support is actually needed.
+> **Security note:** Mounting the Docker socket grants the container full control of the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions are disabled in this mode. Only use `--docker` when Docker support is actually needed.
