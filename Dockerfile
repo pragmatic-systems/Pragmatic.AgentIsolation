@@ -27,7 +27,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
     addgroup appuser docker
 
 # --- Directories ---
-RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /opt/pi-agent && \
+RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuser/.npm /home/appuser/.nuget /opt/pi-agent && \
     chown -R appuser:appgroup /home/appuser
 
 # --- Pi config (baked in to /opt, seeded at runtime by entrypoint) ---

@@ -118,6 +118,8 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 - **Custom models/providers** are configured in `models.json`
 - **Pi cache** is persisted in a Docker volume (`pi_cache`)
 - **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts
+- **npm cache** is persisted in a Docker volume (`npm_cache`) to avoid re-downloading packages
+- **NuGet cache** is persisted in a Docker volume (`nuget_cache`) to avoid re-downloading packages
 
 ### Updating `models.json`
 

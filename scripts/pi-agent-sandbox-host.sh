@@ -48,6 +48,8 @@ DOCKER_ARGS=(
   -v "$(pwd):/home/appuser/mount/${LAUNCH_DIR}:rw"
   -v pi_cache:/home/appuser/.pi/cache:rw
   -v pi_agent:/home/appuser/.pi/agent:rw
+  -v npm_cache:/home/appuser/.npm:rw
+  -v nuget_cache:/home/appuser/.nuget:rw
   -e HOME=/home/appuser
   -e NODE_ENV=development
   -e LMSTUDIO_API_URL=http://host.docker.internal:1234/v1
