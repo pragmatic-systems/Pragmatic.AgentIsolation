@@ -1,5 +1,5 @@
 # -----------------------------------------------------------
-# Pi Coding Agent — isolated harness (locked-down)
+# Pi Coding Agent — sandboxed harness (locked-down)
 # -----------------------------------------------------------
 # .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Pi
 # No Docker CLI, no docker socket mount, no extra capabilities

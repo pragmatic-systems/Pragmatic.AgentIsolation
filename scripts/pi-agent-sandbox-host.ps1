@@ -1,11 +1,11 @@
-# Pi Agent Isolation Harness — PowerShell
+# Pi Agent Sandbox Harness — PowerShell
 # Run from any directory; mounts CWD as Pi's workspace.
 #
 # Usage:
-#   pi-agent-isolation-host             # locked-down (no Docker)
-#   pi-agent-isolation-host --docker    # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host             # locked-down (no Docker)
+#   pi-agent-sandbox-host --docker    # with Docker-in-Docker support (host socket)
 
-# Script runs from /scripts folder inside the Pragmatic.AgentIsolation repo.
+# Script runs from /scripts folder inside the Pragmatic.AgentSandbox repo.
 # Dockerfile/compose in parent directory.
 $RepoRoot = (Resolve-Path (Split-Path -Parent $PSScriptRoot)).Path
 
@@ -18,11 +18,11 @@ if ($args -contains "--docker") {
 # Select Dockerfile and image name
 if ($EnableDocker) {
     $Dockerfile = "Dockerfile"
-    $ImageName = "pi-agent-isolation-host-dind"
+    $ImageName = "pi-agent-sandbox-host-dind"
     Write-Host "[pi-agent] Docker-in-Docker enabled (host socket)"
 } else {
     $Dockerfile = "Dockerfile.locked"
-    $ImageName = "pi-agent-isolation-host"
+    $ImageName = "pi-agent-sandbox-host"
     Write-Host "[pi-agent] Locked-down mode (no Docker)"
 }
 

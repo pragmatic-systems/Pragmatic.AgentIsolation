@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Pi Agent Isolation Harness — Bash
+# Pi Agent Sandbox Harness — Bash
 # Run from any directory; mounts CWD as Pi's workspace.
 #
 # Usage:
-#   pi-agent-isolation-host             # locked-down (no Docker)
-#   pi-agent-isolation-host --docker     # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host             # locked-down (no Docker)
+#   pi-agent-sandbox-host --docker     # with Docker-in-Docker support (host socket)
 
 set -euo pipefail
 
@@ -23,11 +23,11 @@ done
 # Select Dockerfile and image tag
 if [ "$ENABLE_DOCKER" = true ]; then
   DOCKERFILE="Dockerfile"
-  IMAGE_NAME="pi-agent-isolation-host-dind"
+  IMAGE_NAME="pi-agent-sandbox-host-dind"
   echo "[pi-agent] Docker-in-Docker enabled (host socket)"
 else
   DOCKERFILE="Dockerfile.locked"
-  IMAGE_NAME="pi-agent-isolation-host"
+  IMAGE_NAME="pi-agent-sandbox-host"
   echo "[pi-agent] Locked-down mode (no Docker)"
 fi
 

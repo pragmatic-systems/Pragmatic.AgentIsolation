@@ -1,6 +1,6 @@
-# Pi Agent Isolation Harness
+# Pi Agent Sandbox Harness
 
-A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in isolation, with controlled filesystem access and LM Studio integration.
+A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in a sandbox, with controlled filesystem access and LM Studio integration.
 
 ## Setup
 
@@ -8,21 +8,21 @@ Add the `scripts/` folder to your `%PATH%` (Windows) or `$PATH` (Linux/macOS):
 
 ### Windows (PowerShell)
 ```powershell
-[Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\path\to\Pragmatic.AgentIsolation\scripts", "User")
+[Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\path\to\Pragmatic.AgentSandbox\scripts", "User")
 ```
 
 ### Linux / macOS
 ```bash
-export PATH="$PATH:/path/to/Pragmatic.AgentIsolation/scripts"
+export PATH="$PATH:/path/to/Pragmatic.AgentSandbox/scripts"
 ```
 
 ## Quick Start
 
-Run `pi-agent-isolation-host` from any directory — it mounts your current working directory as Pi's workspace:
+Run `pi-agent-sandbox-host` from any directory — it mounts your current working directory as Pi's workspace:
 
 ```bash
 cd /path/to/your/project
-pi-agent-isolation-host
+pi-agent-sandbox-host
 ```
 
 When you exit Pi (Ctrl+C), the container is automatically cleaned up.
@@ -31,12 +31,12 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 
 | Mode | Command | Docker CLI | Host Socket | Security Hardening |
 |---|---|---|---|---|
-| **Locked-down** (default) | `pi-agent-isolation-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
-| **Docker** (opt-in) | `pi-agent-isolation-host --docker` | ✅ | ✅ | None (see Security) |
+| **Locked-down** (default) | `pi-agent-sandbox-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
+| **Docker** (opt-in) | `pi-agent-sandbox-host --docker` | ✅ | ✅ | None (see Security) |
 
 ```bash
 # With Docker support (opt-in, host socket mount)
-pi-agent-isolation-host --docker
+pi-agent-sandbox-host --docker
 ```
 
 ## Prerequisites
@@ -63,7 +63,7 @@ The container has **outbound internet access** by default, so Pi can install too
 Host Machine
 ├── Your project directory
 │   └── (mounted as /home/appuser/mount inside container)
-└── Container: pi-agent-isolation-host
+└── Container: pi-agent-sandbox-host
     ├── Runs Pi (Node.js 22) + .NET SDK 10.0
     ├── Connects to LM Studio via host.docker.internal:1234
     ├── Outbound internet access (package restore, tool install)
@@ -76,7 +76,7 @@ Host Machine
 Host Machine
 ├── Your project directory
 │   └── (mounted as /home/appuser/mount inside container)
-└── Container: pi-agent-isolation-host-dind
+└── Container: pi-agent-sandbox-host-dind
     ├── Runs Pi + Docker CLI
     ├── Connects to LM Studio via host.docker.internal:1234
     ├── Host Docker socket mounted (full Docker access)
@@ -104,7 +104,7 @@ The `--docker` mode mounts the host Docker socket. **This gives the agent full c
 - Escape the container via `nsenter` or `--pid=host`
 - Access any host resource the Docker daemon can reach
 
-**There is no way to give an LLM Docker access without this risk.** Docker-in-Docker sidecars offer the same escape path — the agent controls any daemon it can talk to. The only difference is cosmetic isolation.
+**There is no way to give an LLM Docker access without this risk.** Docker-in-Docker sidecars offer the same escape path — the agent controls any daemon it can talk to. The only difference is cosmetic sandboxing.
 
 Only use `--docker` when you need Docker support and accept that the agent has full Docker access.
 
@@ -119,14 +119,14 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 `models.json` is bind-mounted directly from the repo root, so changes take effect on the **next run**:
 
 ```bash
-pi-agent-isolation-host
+pi-agent-sandbox-host
 ```
 
 If you need to rebuild the image (e.g., after changing the Dockerfile):
 
 ```bash
-docker build -t pi-agent-isolation-host .
-pi-agent-isolation-host
+docker build -t pi-agent-sandbox-host .
+pi-agent-sandbox-host
 ```
 
 ## Docker Support
@@ -134,7 +134,7 @@ pi-agent-isolation-host
 By default, the container runs in **locked-down mode** — no Docker CLI is installed, no socket is mounted, and all Linux capabilities are dropped. To enable Docker support, pass `--docker`:
 
 ```bash
-pi-agent-isolation-host --docker
+pi-agent-sandbox-host --docker
 ```
 
 This mounts the host Docker socket, allowing Pi to run Docker commands (`docker build`, `docker run`, `docker compose`) against the host Docker daemon.
