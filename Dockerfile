@@ -27,13 +27,16 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
     addgroup appuser docker
 
 # --- Directories ---
-RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions && \
+RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /opt/pi-agent && \
     chown -R appuser:appgroup /home/appuser
 
-# --- Pi config (baked in to avoid WSL path-mount issues) ---
-COPY models.json /home/appuser/.pi/agent/models.json
-COPY settings.json /home/appuser/.pi/agent/settings.json
-COPY docker-mode-indicator.ts /home/appuser/.pi/agent/extensions/docker-mode-indicator.ts
+# --- Pi config (baked in to /opt, seeded at runtime by entrypoint) ---
+# Stored outside .pi/agent so the pi_agent volume mount doesn't shadow them
+COPY models.json /opt/pi-agent/models.json
+COPY settings.json /opt/pi-agent/settings.json
+COPY docker-mode-indicator.ts /opt/pi-agent/docker-mode-indicator.ts
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER appuser
 WORKDIR /home/appuser/mount
@@ -41,5 +44,4 @@ WORKDIR /home/appuser/mount
 ENV HOME=/home/appuser
 ENV NODE_ENV=development
 
-# Launch Pi TUI directly so docker attach works
-CMD ["pi"]
+ENTRYPOINT ["entrypoint.sh"]

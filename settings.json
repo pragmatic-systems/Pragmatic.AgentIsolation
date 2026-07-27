@@ -2,6 +2,6 @@
   "lastChangelogVersion": "0.82.1",
   "theme": "dark",
   "extensions": [
-    "~/.pi/agent/extensions/docker-mode-indicator.ts"
+    "~/.pi/agent/docker-mode-indicator.ts"
   ]
 }
