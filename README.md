@@ -118,8 +118,21 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 - **Custom models/providers** are configured in `models.json`
 - **Pi cache** is persisted in a Docker volume (`pi_cache`)
 - **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts
-- **npm cache** is persisted in a Docker volume (`npm_cache`) to avoid re-downloading packages
-- **NuGet cache** is persisted in a Docker volume (`nuget_cache`) to avoid re-downloading packages
+- **npm cache** is persisted in a Docker volume (`npm_cache`)
+- **NuGet cache** is persisted in a Docker volume (`nuget_cache`)
+
+> **Note:** Caches live in Docker named volumes, not on the host filesystem. They persist across container runs but are not shared with the host's own package managers. Stale entries are auto-pruned on startup (see below).
+
+### Cache age limits (configurable)
+
+Both caches prune files not accessed within N days on every container start.
+
+| Variable | Default | Effect |
+|---|---|---|
+| `NUGET_CACHE_MAX_AGE_DAYS` | `30` | Delete NuGet package files unused for N days |
+| `NPM_CACHE_MAX_AGE_DAYS` | `30` | Delete npm cache files unused for N days |
+
+Pass via `-e` in the host scripts or override directly in `docker run`.
 
 ### Updating `models.json`
 

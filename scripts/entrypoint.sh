@@ -22,5 +22,28 @@ for f in "$SEED_DIR"/*; do
   fi
 done
 
+# --- Cache age limits ---
+# Prune both NuGet and npm caches for files not accessed in N days.
+# Override via NUGET_CACHE_MAX_AGE_DAYS and NPM_CACHE_MAX_AGE_DAYS.
+NUGET_CACHE_MAX_AGE_DAYS="${NUGET_CACHE_MAX_AGE_DAYS:-30}"
+NPM_CACHE_MAX_AGE_DAYS="${NPM_CACHE_MAX_AGE_DAYS:-30}"
+
+if [ -d "$HOME/.nuget/packages" ]; then
+  count=$(find "$HOME/.nuget/packages" -type f -atime +"$NUGET_CACHE_MAX_AGE_DAYS" | wc -l)
+  if [ "$count" -gt 0 ]; then
+    echo "[cache] Pruning $count NuGet package files unused for ${NUGET_CACHE_MAX_AGE_DAYS} days"
+    find "$HOME/.nuget/packages" -type f -atime +"$NUGET_CACHE_MAX_AGE_DAYS" -delete
+    find "$HOME/.nuget/packages" -type d -empty -delete 2>/dev/null || true
+  fi
+fi
+
+if [ -d "$HOME/.npm/_cacache" ]; then
+  count=$(find "$HOME/.npm/_cacache" -type f -atime +"$NPM_CACHE_MAX_AGE_DAYS" | wc -l)
+  if [ "$count" -gt 0 ]; then
+    echo "[cache] Pruning $count npm cache files unused for ${NPM_CACHE_MAX_AGE_DAYS} days"
+    find "$HOME/.npm/_cacache" -type f -atime +"$NPM_CACHE_MAX_AGE_DAYS" -delete
+  fi
+fi
+
 # Hand off to Pi
 exec pi
