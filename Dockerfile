@@ -7,7 +7,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
 # Install system packages
-RUN apk add --no-cache nodejs npm docker bash curl
+RUN apk add --no-cache nodejs npm docker bash curl grep
 
 # Install .NET 8.0 SDK
 RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
